@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookClasses", "BookClasses\BookClasses.csproj", "{B8A3BBF3-376C-44E9-99B3-8B2FA381EAF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookListServiceConsole", "BookListServiceConsole\BookListServiceConsole.csproj", "{27E5142E-A3F5-4B68-AF1A-BC4D0387DB0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8A3BBF3-376C-44E9-99B3-8B2FA381EAF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A3BBF3-376C-44E9-99B3-8B2FA381EAF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A3BBF3-376C-44E9-99B3-8B2FA381EAF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A3BBF3-376C-44E9-99B3-8B2FA381EAF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27E5142E-A3F5-4B68-AF1A-BC4D0387DB0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27E5142E-A3F5-4B68-AF1A-BC4D0387DB0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27E5142E-A3F5-4B68-AF1A-BC4D0387DB0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27E5142E-A3F5-4B68-AF1A-BC4D0387DB0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
