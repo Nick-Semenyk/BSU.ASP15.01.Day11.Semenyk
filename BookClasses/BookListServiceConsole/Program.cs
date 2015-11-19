@@ -13,13 +13,11 @@ namespace BookListServiceConsole
     {
         static void Main(string[] args)
         {
-            BookListServiceToXml repository = new BookListServiceToXml("books.xml");
-            //read or recreate??
-            //   Stream stream = new FileStream("books.b", FileMode.OpenOrCreate);
+            //BookListServiceToXml repository = new BookListServiceToXml("books.xml");
+            BookListServiceLinqToXml rep = new BookListServiceLinqToXml("linqbooks.xml");
             Book book = new Book();
             Logger logger = LogManager.GetCurrentClassLogger();
             BookListService service = new BookListService();
-            //service.Load(stream);
             book.Author = "author2";
             book.Title = "title";
             book.Length = 100;
@@ -33,18 +31,12 @@ namespace BookListServiceConsole
             book.YearOfPublishing = 2000;
             book.EditionNumber = 1;
             service.Add(book);
-            service.Save(repository);
-            /*List<Book> list = service.FindByTag(b => b.Author == "author");
-            logger.Info("Test");
-            foreach (Book result in list)
-            {
-                Console.WriteLine(result.ToString());
-            }
-            Console.ReadLine();*/
+            //service.Save(repository);
+            service.Save(rep);
             service = new BookListService();
-            service.Load(repository);
+           // service.Load(repository);
+            service.Load(rep);
             List<Book> list = service.FindByTag(b => b.Author == "author");
-            logger.Info("Test");
             foreach (Book result in list)
             {
                 Console.WriteLine(result.ToString());

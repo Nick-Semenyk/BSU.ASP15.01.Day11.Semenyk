@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -9,6 +10,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 using NLog;
 
@@ -17,9 +19,7 @@ namespace BookClasses
     public interface IRepository<T>
     {
         void Add(T entity);
-        void Delete(T entity);
         void AddValues(IEnumerable<T> values);
-        void DeleteValues(IEnumerable<T> values);
         T ReadNext();
         List<T> ReadAll();  
         void Clear();
@@ -40,6 +40,7 @@ namespace BookClasses
 
         public void Add(Book entity)
         {
+            throw new NotSupportedException();
         }
 
         public void AddValues(IEnumerable<Book> values)
@@ -63,17 +64,164 @@ namespace BookClasses
             file = new FileStream(path, FileMode.Create);
         }
 
-        public void Delete(Book entity)
+        public Book ReadNext()
         {
+            throw new NotSupportedException();
+        }
+    }
+
+    public class BookListServiceToBinaryFile : IRepository<Book>
+    {
+        //private FileStream stream;
+        private string path;
+        private FileStream file;
+        private BinaryWriter writer;
+        private BinaryReader reader;
+
+        public BookListServiceToBinaryFile(string path)
+        {
+            this.path = path;
+            file = new FileStream(path, FileMode.OpenOrCreate);
+            writer = new BinaryWriter(file);
+            reader = new BinaryReader(file);
         }
 
-        public void DeleteValues(IEnumerable<Book> values)
+        public void Add(Book book)
         {
+            writer.Write(book.Title);
+            writer.Write(book.Author);
+            writer.Write(book.Length);
+            writer.Write(book.YearOfPublishing);
+            writer.Write(book.EditionNumber);
+        }
+
+        public void AddValues(IEnumerable<Book> values)
+        {
+            foreach(Book book in values)
+            {
+                writer.Write(book.Title);
+                writer.Write(book.Author);
+                writer.Write(book.Length);
+                writer.Write(book.YearOfPublishing);
+                writer.Write(book.EditionNumber);
+            }
+        }
+
+        public List<Book> ReadAll()
+        {
+            reader.BaseStream.Position = 0;
+            List<Book> result = new List<Book>();
+            while (reader.BaseStream.Position != reader.BaseStream.Length)
+            {
+                Book book = new Book();
+                book.Title = reader.ReadString();
+                book.Author = reader.ReadString();
+                book.Length = reader.ReadInt32();
+                book.YearOfPublishing = reader.ReadInt32();
+                book.EditionNumber = reader.ReadInt32();
+                result.Add(book);
+            }
+            return new List<Book>(result);
+        }
+
+        public void Clear()
+        {
+            file = new FileStream(path, FileMode.Create);
         }
 
         public Book ReadNext()
         {
+            if (reader.BaseStream.Position != reader.BaseStream.Length)
+            {
+                Book book = new Book();
+                book.Title = reader.ReadString();
+                book.Author = reader.ReadString();
+                book.Length = reader.ReadInt32();
+                book.YearOfPublishing = reader.ReadInt32();
+                book.EditionNumber = reader.ReadInt32();
+                return book;
+            }
             return null;
+        }
+    }
+
+    public class BookListServiceLinqToXml : IRepository<Book>
+    {
+        private string path;
+        private FileStream file;
+
+        public BookListServiceLinqToXml(string path)
+        {
+            this.path = path;
+        }
+
+        public void Add(Book entity)
+        {
+            throw new NotSupportedException();
+        }
+
+        public void AddValues(IEnumerable<Book> values)
+        {
+            if (values == null || !values.Any())
+                return;
+            file = new FileStream(path, FileMode.OpenOrCreate);
+            XElement[] bookNodes = new XElement[values.Count()];
+            int i = 0;
+            foreach(Book book in values)
+            {
+                bookNodes[i] = new XElement("Book",
+                                    new XElement("Author", book.Author),
+                                    new XElement("Title", book.Title),
+                                    new XElement("Length", book.Length),
+                                    new XElement("YearOfPublishing", book.YearOfPublishing),
+                                    new XElement("EditionNumber", book.EditionNumber)
+                    );
+                i++;
+            }
+            XElement root = new XElement("Books", bookNodes);
+            XDocument document = new XDocument(root);
+            document.Save(file);
+            file.Close();
+        }
+
+        public Book ReadNext()
+        {
+            throw new NotSupportedException();
+        }
+
+        public List<Book> ReadAll()
+        {
+            XDocument document = new XDocument();
+            file = new FileStream(path, FileMode.Open);
+            document = XDocument.Load(file);
+            var result = from s in document.Descendants("Book")
+                        select new
+                        {
+                            Author = s.Element("Author").Value,
+                            Title = s.Element("Title").Value,
+                            Length = int.Parse(s.Element("Length").Value),
+                            YearOfPublishing = int.Parse(s.Element("YearOfPublishing").Value),
+                            EditionNumber = int.Parse(s.Element("EditionNumber").Value)
+                        };
+            List<Book> books = new List<Book>();
+            foreach (var item in result)
+            {
+                Book book = new Book();
+                book.Author = item.Author;
+                book.Title = item.Title;
+                book.Length = item.Length;
+                book.YearOfPublishing = item.YearOfPublishing;
+                book.EditionNumber = item.EditionNumber;
+                books.Add(book);
+            }
+            file.Close();
+            return books;
+        }
+
+        public void Clear()
+        {
+            file = new FileStream(path, FileMode.Create);
+            file.Close();
         }
     }
 
